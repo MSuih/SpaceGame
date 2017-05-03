@@ -1,16 +1,11 @@
 import connection
 
 class Player():
-    def __init__(self, number, firstName = None, lastName = None):
+    def __init__(self, number, firstName, lastName, money = None):
         self.number = number
         self.firstName = firstName
         self.lastName = lastName
-
-    def getFirstName(self):
-        if not self.firstName:
-            self.firstName = connection.getFirstNameForPlayer(number)
-        return self.firstName
-             
+        self.money = money
 
 # Starts and returns a new game 
 # name is a tuple of first and last names
@@ -18,13 +13,19 @@ class Player():
 def startNewGame(name):
     first = name[0]
     last = name[1]
-    number = connection.createPlayerAndReturnId(first, last)
-    player = Player(number, name[first, last)
-    return player
+    result = connection.createPlayerAndReturnId(first, last)
+    if result:
+        player = Player(
+            result.number,
+            result.firstName,
+            result.lastName,
+            result.money)
+        return player
+    return None
 
 # Loads and returns a game from the database
 # number is the ID number of this save
 # returns None if a save was not found or could not be loaded
 def loadSave(number):
-    status = connection.doesPlayerExist(number)
+    status = connection.getPlayer(number)
     if status: return Player(number)

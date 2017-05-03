@@ -5,12 +5,12 @@ class State(enum.Enum):
 
 def main(): 
     state = State.MENU
-    game = None
+    player = None
 
     print("Welcome to game")
-    print("\nSTART - start a new game")
-    print("LIST - list saved games")
-    print("LOAD number - load a saved game")
+    print("\nSTART - start a new player")
+    print("LIST - list saved players")
+    print("LOAD number - load a saved player")
 
     while state != State.QUIT:
         parse = parser.parseCommand(input("=> "))
@@ -21,31 +21,38 @@ def main():
             print("Thank you for playing!")
             sys.exit()
         if state == State.MENU:
-            value = menu.processInput(parse)
-            if value:
-                if isinstance(value, int):
-                    save = game.loadSave(value)
-                    if save:
-                        game = save
-                        state = State.GAME
-                    else:
-                        print("Could not retrieve that save.")
-                elif isinstance(value, tuple):
-                    print("TODO")
-                    save = game.startNewGame()
-                    if save:
-                        game = save
-                        state = State.GAME
-                    else:
-                        print("Could not create a new game")
-                else:
-                    if state == MAINMENU:
-                        print("Cannot return - game is not open")
-                    else:
-                        state = State.GAME
-            elif value == None:
-                print("Invalid command")
-        #elif state == State.GAME:
+            _handleMenu(parse)
+        elif state == State.GAME:
+            _handleGame(parse)
     return
 
-main()
+def _handleMenu(parse):
+    value = menu.processInput(parse)
+    if value:
+        if isinstance(value, int):
+            save = game.loadSave(value)
+            if save:
+                player = save
+                state = State.GAME
+            else:
+                print("Could not retrieve that save.")
+        elif isinstance(value, tuple):
+            save = game.startNewGame(value)
+            if save:
+                player = save
+                state = State.GAME
+            else:
+                print("Could not create a new player")
+        else:
+            if state == MAINMENU:
+                print("Cannot return - player is not open")
+            else:
+                state = State.GAME
+    elif value == None:
+        print("Invalid command")
+
+def _handleGame(parse):
+    print("Todo")
+
+if __name__ == "__main__":
+    main()
