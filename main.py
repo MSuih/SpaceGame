@@ -7,7 +7,7 @@ def main():
     state = State.MENU
     player = None
 
-    print("Welcome to game")
+    print("Welcome to Beyond Infinity")
     print("\nSTART - start a new player")
     print("LIST - list saved players")
     print("LOAD number - load a saved player")
@@ -34,6 +34,7 @@ def _handleMenu(parse):
             if save:
                 player = save
                 state = State.GAME
+                player.printCurrentSituation()
             else:
                 print("Could not retrieve that save.")
         elif isinstance(value, tuple):
@@ -41,18 +42,22 @@ def _handleMenu(parse):
             if save:
                 player = save
                 state = State.GAME
+                player.printCurrentSituation()
             else:
                 print("Could not create a new player")
         else:
             if state == MAINMENU:
-                print("Cannot return - player is not open")
+                print("Cannot return - you have not loaded a save")
             else:
                 state = State.GAME
     elif value == None:
         print("Invalid command")
 
 def _handleGame(parse):
-    print("Todo")
+    if player.isInCombat():
+        combat.processCombat()
+    else:
+        if game.isSituationalCommand(parse.command):
 
 if __name__ == "__main__":
     main()

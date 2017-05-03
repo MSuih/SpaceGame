@@ -45,12 +45,22 @@ def getPlayer(number):
             firstName = row[1],
             lastName = row[2],
             money = row[3])
-    cursor.close
+    cursor.close()
     return player
 
-def createPlayerAndReturnId(firstName, lastName):
-    # create a ship for the player
+def getSituationDescriptionForPlayer(number):
     cursor = _dbcon.cursor()
+    sql = """SELECT description FROM situation
+        JOIN player ON situation.id = player.situation
+        WHERE player.id = """ + number
+    cursor.execute(sql)
+    description = cursor.fetchone()[0]
+    cursor.close()
+    return description
+
+def createPlayerAndReturnId(firstName, lastName):
+    cursor = _dbcon.cursor()
+    # find the maxHealth for player ship and use it to set current health
     sqlHealth = "SELECT maxHealth FROM ShipType WHERE id = 0;"
     cursor.execute(sqlHealth)
     try:
@@ -58,10 +68,14 @@ def createPlayerAndReturnId(firstName, lastName):
     except TypeError:
         print("ERROR: ShipType 0 does not exist!")
         return None
+    # create a new ship for the player 
     newship = "INSERT INTO ship (health, shipType) VALUES (%d, 0);" % (health,)
     cursor.execute(newship)
     # get id of the ship created
     number = cursor.lastrowid
+    # --- TODO :
+    # find out what systems should be installed by default
+    # add them to the player ship
     # create a new player
     newplayer = """INSERT INTO player
         (firstName, lastName, ship) VALUES
