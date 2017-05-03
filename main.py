@@ -29,10 +29,15 @@ def main():
                         game = save
                         state = State.GAME
                     else:
-                        print("Game not found")
+                        print("Could not retrieve that save.")
                 elif isinstance(value, tuple):
                     print("TODO")
-                    # start a new game 
+                    save = game.startNewGame()
+                    if save:
+                        game = save
+                        state = State.GAME
+                    else:
+                        print("Could not create a new game")
                 else:
                     if state == MAINMENU:
                         print("Cannot return - game is not open")
