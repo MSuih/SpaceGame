@@ -19,6 +19,7 @@ class Player():
         situation = self.getSituationNumber()
         sit_enemy = connection.getEnemyNumberForSituation()
         return sit_enemy == False
+    
     def enemyAlive():
         connection.getEnemyForPlayer(self.number)
 
@@ -46,6 +47,12 @@ def loadSave(number):
     if status: return Player(number)
 
 # Checks if the command is situation-related 
-def isSituationalCommand(command):
+def isSituationRelatedCommand(command):
     print("TODO: situtional command check")
     return False
+
+def openInventory(number):
+    #list inventory items
+    #ask player what to do
+    #if command is related to items, execute it
+    #loop untill player closes inventory

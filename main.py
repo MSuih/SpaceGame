@@ -4,7 +4,7 @@ class State(enum.Enum):
     MAINMENU, MENU, GAME, INVENTORY, QUIT = range(5)
 
 def main(): 
-    state = State.MENU
+    state = State.MAINMENU
     player = None
 
     print("Welcome to Beyond Infinity")
@@ -20,7 +20,7 @@ def main():
             connection.saveChanges()
             print("Thank you for playing!")
             sys.exit()
-        if state == State.MENU:
+        if state == State.MENU or state == State.MAINMENU:
             _handleMenu(parse)
         elif state == State.GAME:
             _handleGame(parse)
@@ -61,16 +61,26 @@ def _handleGame(parse):
         if not connection.isCorrectEnemyForSituation(
             number, player.getSituationNumber()):
             _startCombat(player, number)
-        else if player.enemyAlive():
+        elif player.enemyAlive():
             _startCombat(player, number)
-            
+        else:
+            # Combat has ended
+            return
     else:
-        if game.isSituationalCommand(parse.command):
+        if game.isSituationRelatedCommand(parse.command):
+            # check if command is possible and execute it
+        else:
+            if parse.command == parser.Commands.INVENTORY:
+                game.openInventory(player.number)
+            elif parse.command == parser.Commands.MENU:
+                state = State.MENU
+                
 
 def _startCombat(player, enemyNumber):
     if enemyNumber == None:
         #TODO: create a new enemy
-        enemy = None
+        enemytype = connection.getEnemyForSituation()
+        enemy = connection.createAndReturnEnemy(enemytype)
         player.setEnemy(enemy)
     combat.processCombat(player, player.getEnemy())
     player.printSituationEndtext()

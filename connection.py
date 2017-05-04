@@ -90,9 +90,7 @@ def createPlayerAndReturnId(firstName, lastName):
     cursor.execute(newship)
     # get id of the ship created
     number = cursor.lastrowid
-    # --- TODO :
-    # find out what systems should be installed by default
-    # add them to the player ship
+    addSystemsAndWeaponsToShip(0, number)
     # create a new player
     newplayer = """INSERT INTO player
         (firstName, lastName, ship) VALUES
@@ -103,3 +101,30 @@ def createPlayerAndReturnId(firstName, lastName):
     cursor.close()
     # return id
     return number
+
+def addSystemsAndWeaponsToShip(shiptype, ship):
+    # TODO!
+    #find each systemtype for this type
+    #create systems from types
+    #do the same for weapon types
+    return
+
+def getEnemyForSituation(situation):
+    cursor = _dbcon.cursor()
+    sql = "SELECT enemy FROM situation WHERE id = " + str(situation) + ";"
+    cursor.execute(sql)
+    number = cursor.fetchone()
+    cursor.close()
+    return number
+
+def createAndReturnEnemy(enemyType):
+    cursor = _dbcon.cursor()
+    sqlHealth = "SELECT maxHealth FROM ShipType WHERE id = " +str(enemytype)+";"
+    cursor.execute(sql)
+    health = cursor.fetchone()[0]
+    sqlShip = "INSERT INTO ship (health, shipType) VALUES (" + str(health) + str(enemyType) + ");"
+    cursor.execute(sql)
+    enemy = cursor.lastrowid
+    addSystemsAndWeaponsToShip(enemytype, enemy)
+    cursor.close()
+    return enemy
