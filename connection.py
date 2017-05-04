@@ -20,7 +20,7 @@ def discardChanges():
 def getPlayers():
     playerList = []
     cursor = _dbcon.cursor()
-    sql = "SELECT id, firstName, lastName, money FROM player"
+    sql = "SELECT id, firstName, lastName, money FROM player;"
     cursor.execute(sql)
     result = cursor.fetchall()
     for row in result:
@@ -52,7 +52,7 @@ def getSituationDescriptionForPlayer(number):
     cursor = _dbcon.cursor()
     sql = """SELECT description FROM situation
         JOIN player ON situation.id = player.situation
-        WHERE player.id = """ + number
+        WHERE player.id = %i;""" % (number,)
     cursor.execute(sql)
     description = cursor.fetchone()[0]
     cursor.close()
@@ -71,7 +71,7 @@ def isCorrectEnemyForSituation(enemy, situation):
     sql = """SELECT enemy.id FROM enemy
         JOIN enemytype ON enemy.enemyType = enemytype.id
         JOIN situation ON enemytype.id = situation.enemy
-        WHERE enemy.id = %i AND situation.id = %i""" % (enemy, situation)
+        WHERE enemy.id = %i AND situation.id = %i;""" % (enemy, situation)
     cursor.execute(sql)
     return len(cursor.fetchone()) == 0
 
