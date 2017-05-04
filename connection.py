@@ -9,6 +9,7 @@ _dbcon = mysqlcon.connect(
 
 SimplePlayer = collections.namedtuple(
     "SimplePlayer", "number, firstName, lastName, money")
+SimpleItem = collections.namedtuple("SimpleItem", "number, name, visible")
 
 
 def saveChanges():
@@ -128,3 +129,22 @@ def createAndReturnEnemy(enemyType):
     addSystemsAndWeaponsToShip(enemytype, enemy)
     cursor.close()
     return enemy
+
+def getItemsForPlayer(player):
+    items = []
+    cursor = _dbcon.cursor()
+    sql = """SELECT item.id, item.name, item.visible FROM items
+        JOIN owneditems ON item.id = owneditems.item
+        WHERE owneditems.player = %i;""" % (player,)
+    cursor.execute()
+    for row in cursor.fetchall():
+        item = SimpleItem(row[0], row[1], row[2])
+        items.append(item)
+    cursor.close()
+    return items
+
+def playerHasItem(player, itemname):
+    cursor = _dbcon.cursor()
+    sql = """SELECT owneditems.item FROM owneditems
+        JOIN items ON owneditems.item = items.id
+        WHERE owneditems.player = "%s" AND """

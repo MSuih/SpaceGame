@@ -3,7 +3,8 @@ import collections, enum
 # All commands that player can do
 class Commands(enum.Enum):
     INVALID, QUIT, GOTO, TALK, INVENTORY = range(0, 5)
-    LISTSAVES, LOADGAME, NEWGAME, RETURN = range(5, 9)
+    LISTSAVES, LOADGAME, NEWGAME, RETURN, DELETE = range(5, 10)
+    USE = range(10, 11)
 
 # Tuple that contains a command and the target of that command
 # ParseResult.command is one of the commands defined above (enum)
