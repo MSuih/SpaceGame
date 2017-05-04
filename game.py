@@ -50,9 +50,3 @@ def loadSave(number):
 def isSituationRelatedCommand(command):
     print("TODO: situtional command check")
     return False
-
-def openInventory(number):
-    #list inventory items
-    #ask player what to do
-    #if command is related to items, execute it
-    #loop untill player closes inventory
