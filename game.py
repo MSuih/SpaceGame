@@ -19,6 +19,8 @@ class Player():
         situation = self.getSituationNumber()
         sit_enemy = connection.getEnemyNumberForSituation()
         return sit_enemy == False
+    def enemyAlive():
+        connection.getEnemyForPlayer(self.number)
 
 # Starts and returns a new game 
 # name is a tuple of first and last names
@@ -47,4 +49,3 @@ def loadSave(number):
 def isSituationalCommand(command):
     print("TODO: situtional command check")
     return False
-    

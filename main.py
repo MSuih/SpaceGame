@@ -55,9 +55,25 @@ def _handleMenu(parse):
 
 def _handleGame(parse):
     if player.isInCombat():
-        combat.processCombat()
+        number = player.getActiveCombat()
+        if number == None:
+            _startCombat(player, number)
+        if not connection.isCorrectEnemyForSituation(
+            number, player.getSituationNumber()):
+            _startCombat(player, number)
+        else if player.enemyAlive():
+            _startCombat(player, number)
+            
     else:
         if game.isSituationalCommand(parse.command):
+
+def _startCombat(player, enemyNumber):
+    if enemyNumber == None:
+        #TODO: create a new enemy
+        enemy = None
+        player.setEnemy(enemy)
+    combat.processCombat(player, player.getEnemy())
+    player.printSituationEndtext()
 
 if __name__ == "__main__":
     main()

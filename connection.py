@@ -58,6 +58,23 @@ def getSituationDescriptionForPlayer(number):
     cursor.close()
     return description
 
+def getEnemyForPlayer(number):
+    cursor = _dbcon.cursor()
+    sql = "SELECT lastEncounter FROM player WHERE id = " + str(number)
+    cursor.execute(sql)
+    result = cursor.fetchone()[0]
+    cursor.close()
+    return result
+
+def isCorrectEnemyForSituation(enemy, situation):
+    cursor = _dbcon.cursor()
+    sql = """SELECT enemy.id FROM enemy
+        JOIN enemytype ON enemy.enemyType = enemytype.id
+        JOIN situation ON enemytype.id = situation.enemy
+        WHERE enemy.id = %i AND situation.id = %i""" % (enemy, situation)
+    cursor.execute(sql)
+    return len(cursor.fetchone()) == 0
+
 def createPlayerAndReturnId(firstName, lastName):
     cursor = _dbcon.cursor()
     # find the maxHealth for player ship and use it to set current health
