@@ -12,6 +12,10 @@ SimplePlayer = collections.namedtuple(
 SimpleItem = collections.namedtuple("SimpleItem", "number, name, visible")
 RequirementsForNext = collections.namedtuple("RequirementsForNext",
     "nextSituation, requirement, requiredAmount")
+MovementToNext = collections.namedtuple("MovementToNext",
+    """toSituation, description, requirement, requiredAmount,
+        removeItem, rewards, rewardedAmount""")
+
 
 
 def saveChanges():
@@ -207,7 +211,7 @@ def getSituationOf(player):
 def getNextSituation(situation, parse):
     lista = []
     cursor = _dbcon.cursor()
-    cnum = _getDBNumberForCommand()
+    cnum = _getDBNumberForCommand(parse.command)
     sql = """SELECT toSituation, requires, requiredAmount FROM NextSituation
         WHERE fromSituation = %i AND command = %i AND target = %
         ORDER BY
@@ -222,6 +226,27 @@ def getNextSituation(situation, parse):
                 requiredAmount = row[2]))
     cursor.close()
     return lista
+
+def getFullMove(currentSituation, reqForNext):
+    cursor = _dbcon.cursor()
+    sql = """SELECT toSituation, description,
+    requires, requiredAmount, removeItem, rewards, rewardedAmount
+    FROM NextSituation
+    WHERE fromSituation = %i AND toSituation = %i
+    AND requires = %i AND requiredAmount = %i;""" %(currentSituation,
+            reqForNext.nextSituation, reqForNext.requirement, regForNext.requiredAmount)
+    cursor.executeQuery();
+    result = cursor.fetchone():
+    fullmove = MovementToNext(
+        toSituation = result[0],
+        description = result[1],
+        requirement = result[2],
+        requiredAmount = result[3],
+        removeItem = result[4],
+        rewards = result[5],
+        rewardedAmount = result[6])
+    cursor.close()
+    return fullmove
 
 _commandcache = {}
 def _getDBNumberForCommand(command):

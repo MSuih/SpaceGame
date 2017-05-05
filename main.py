@@ -73,7 +73,7 @@ def _handleGame(parse):
         if parser.isSituationalCommand(parse.command):
             result = game.canPerformCommand(player, parse)
             if result:
-                player.performCommand(result)
+                print(player.performCommand(result))
                 print("---")
                 player.printCurrentSituation()
             elif result is None:

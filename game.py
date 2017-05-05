@@ -29,8 +29,14 @@ class Player():
     def addItem(self, item, amount = 1):
         connection.addItemToPlayer(item, self.number, amount)
 
-    def performCommand(self, command):
-        assert False == True
+    def performCommand(self, reqForNext):
+        fullmove = connection.getFullMove(self.getSituationNumber(),reqForNext)
+        if fullmove.removeItem:
+            self.removeItem(fullmove.requirement, fullmove.requiredAmount)
+        if fullmove.rewards:
+            self.addItem(fullmove.rewards, fullmove.rewardedAmount)
+        return fullmove.description
+            
 
 # Starts and returns a new game 
 # name is a tuple of first and last names
