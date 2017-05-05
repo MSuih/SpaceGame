@@ -21,7 +21,16 @@ class Player():
         return connection.getEnemyForPlayer(self.number)
 
     def hasItem(self, item, amount = 1):
-        return connection.hasPlayerAmountOfItem(player, item, amount)
+        return connection.hasPlayerAmountOfItem(self.number, item, amount)
+
+    def removeItem(self, item, amount = 1):
+        connection.removeItemFromPlayer(item, self.number, amount)
+
+    def addItem(self, item, amount = 1):
+        connection.addItemToPlayer(item, self.number, amount)
+
+    def performCommand(self, command):
+        assert False == True
 
 # Starts and returns a new game 
 # name is a tuple of first and last names
@@ -46,14 +55,16 @@ def loadSave(number):
     if status: return Player(
         status.number, status.firstName, status.lastName)
 
+# Can player perform this command?
+# returns none if parse is not valid for this location
+# returns False if player is missing an item
+# returns RequirementsForNext if command can be performed 
 def canPerformCommand(player, parse):
     attempts = connection.getNextSituation(player.getSituationNumber, parse)
     if not attempts:
         return None
     for attempt in attempts:
-        if attempt.requirement:
-            if player.hasItem(attempt.requirement, attempt.requiredAmount):
-                return True
-        else:
-            return True
+        if not attempt.requirement
+            or player.hasItem(attempt.requirement, attempt.requiredAmount):
+            return attempt
     return False

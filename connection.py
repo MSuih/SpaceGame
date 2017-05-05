@@ -169,6 +169,22 @@ def playerHasItem(player, itemname):
     cursor.close()
     return result
 
+def removeItemFromPlayer(player, item, amount):
+    cursor = _dbcon.cursor()
+    sql = """DELETE FROM OwnedItems
+        WHERE player = %i AND item = %i
+        LIMIT %i;""" % (player, item, amount)
+    cursor.execute(sql)
+    cursor.close()
+    
+def addItemToPlayer(player, item, amount):
+    cursor = _dbcon.cursor()
+    sql = """INSERT INTO OwnedItems (player, item)
+        VALUES (%i, %i);""" % (player, item)
+    for i in range(amount):
+        cursor.execute(sql)
+    cursor.close()
+
 def hasPlayerAmountOfItem(player, item, amount):
     cursor = _dbcon.cursor()
     sql = """SELECT count(item) FROM OwnedItems

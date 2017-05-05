@@ -72,6 +72,14 @@ def _handleGame(parse):
     else:
         if parser.isSituationalCommand(parse.command):
             result = game.canPerformCommand(player, parse)
+            if result:
+                player.performCommand(result)
+                print("---")
+                player.printCurrentSituation()
+            elif result is None:
+                print("Invalid command or target")
+            else:
+                print("You cannot do this right now")
         else:
             if parse.command == parser.Commands.INVENTORY:
                 inventory.openInventory(player.number)
