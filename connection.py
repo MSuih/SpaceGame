@@ -169,6 +169,17 @@ def playerHasItem(player, itemname):
     cursor.close()
     return result
 
+def hasPlayerAmountOfItem(player, item, amount):
+    cursor = _dbcon.cursor()
+    sql = """SELECT count(item) FROM OwnedItems
+        WHERE player = %i AND item = %i;""" % (player, item)
+    cursor.execute(sql)
+    result = cursor.fetchone()
+    if result:
+        result = result >= amount
+    cursor.close()
+    return result()
+
 def getSituationOf(player):
     cursor = _dbcon.cursor()
     sql = "SELECT situation FROM Player WHERE id = %i;" % (player,)
@@ -180,11 +191,12 @@ def getSituationOf(player):
 def getNextSituation(situation, parse):
     lista = []
     cursor = _dbcon.cursor()
-    #"next, requirement, requiredAmount
     cnum = _getDBNumberForCommand()
     sql = """SELECT toSituation, requires, requiredAmount FROM NextSituation
-        WHERE fromSituation = %i AND command = %i AND target = %;
-        """ % (situation, cnum, parse.target)
+        WHERE fromSituation = %i AND command = %i AND target = %
+        ORDER BY
+          CASE WHEN requires IS null THEN 1 ELSE 0,
+          requiredAmount;""" % (situation, cnum, parse.target)
     cursor.execute(sql)
     for row in cursor.fetchall():
         lista.append(

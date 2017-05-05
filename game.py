@@ -20,6 +20,9 @@ class Player():
     def enemyAlive():
         return connection.getEnemyForPlayer(self.number)
 
+    def hasItem(self, item, amount = 1):
+        return connection.hasPlayerAmountOfItem(player, item, amount)
+
 # Starts and returns a new game 
 # name is a tuple of first and last names
 # returns None if game could not be started for some reason
@@ -44,6 +47,13 @@ def loadSave(number):
         status.number, status.firstName, status.lastName)
 
 def canPerformCommand(player, parse):
-    attempt = connection.getNextSituation(player.getSituationNumber, parse)
-    if not attempt:
-        return False
+    attempts = connection.getNextSituation(player.getSituationNumber, parse)
+    if not attempts:
+        return None
+    for attempt in attempts:
+        if attempt.requirement:
+            if player.hasItem(attempt.requirement, attempt.requiredAmount):
+                return True
+        else:
+            return True
+    return False
