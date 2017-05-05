@@ -17,7 +17,13 @@ def saveChanges():
 
 def discardChanges():
     _dbcon.rollback()
-    
+
+def deleteSave(number):
+    cursor = _dbcon.cursor()
+    sql = "DELETE FROM player WHERE id = %i;" % (number,)
+    cursor.execute(sql)
+    cursor.close()
+
 def getPlayers():
     playerList = []
     cursor = _dbcon.cursor()
@@ -79,7 +85,7 @@ def isCorrectEnemyForSituation(enemy, situation):
 def createPlayerAndReturnId(firstName, lastName):
     cursor = _dbcon.cursor()
     # find the maxHealth for player ship and use it to set current health
-    sqlHealth = "SELECT maxHealth FROM ShipType WHERE id = 0;"
+    sqlHealth = "SELECT maxHealth FROM ShipType WHERE id = 1;"
     cursor.execute(sqlHealth)
     try:
         health = cursor.fetchone()[0]
@@ -87,7 +93,7 @@ def createPlayerAndReturnId(firstName, lastName):
         print("ERROR: ShipType 0 does not exist!")
         return None
     # create a new ship for the player 
-    newship = "INSERT INTO ship (health, shipType) VALUES (%d, 0);" % (health,)
+    newship = "INSERT INTO ship (health, shipType) VALUES (%d, 1);" % (health,)
     cursor.execute(newship)
     # get id of the ship created
     number = cursor.lastrowid
@@ -95,8 +101,8 @@ def createPlayerAndReturnId(firstName, lastName):
     # create a new player
     newplayer = """INSERT INTO player
         (firstName, lastName, ship) VALUES
-        (%s, %s, %d);""" % (number, firstName, lastName)
-    cursor.execute(newPlayer)
+        ("%s", "%s", %i);""" % (firstName, lastName, number)
+    cursor.execute(newplayer)
     # get last id
     number = cursor.lastrowid
     cursor.close()
@@ -112,7 +118,7 @@ def addSystemsAndWeaponsToShip(shiptype, ship):
 
 def getEnemyForSituation(situation):
     cursor = _dbcon.cursor()
-    sql = "SELECT enemy FROM situation WHERE id = " + str(situation) + ";"
+    sql = "SELECT enemy FROM situation WHERE id = %i ;" % (situation, )
     cursor.execute(sql)
     number = cursor.fetchone()
     cursor.close()
@@ -130,13 +136,19 @@ def createAndReturnEnemy(enemyType):
     cursor.close()
     return enemy
 
-def getItemsForPlayer(player):
+def getItemsForPlayer(player, visibleOnly):
     items = []
     cursor = _dbcon.cursor()
-    sql = """SELECT item.id, item.name, item.visible FROM items
-        JOIN owneditems ON item.id = owneditems.item
-        WHERE owneditems.player = %i;""" % (player,)
-    cursor.execute()
+    sql = ""
+    if visibleOnly:
+        sql = """SELECT item.id, item.name, item.visible FROM item
+            JOIN owneditems ON item.id = owneditems.item
+            WHERE owneditems.player = %i AND item.visible = TRUE;""" % (player,)
+    else:
+        sql = """SELECT item.id, item.name, item.visible FROM item
+            JOIN owneditems ON item.id = owneditems.item
+            WHERE owneditems.player = %i;""" % (player,)
+    cursor.execute(sql)
     for row in cursor.fetchall():
         item = SimpleItem(row[0], row[1], row[2])
         items.append(item)
@@ -147,4 +159,17 @@ def playerHasItem(player, itemname):
     cursor = _dbcon.cursor()
     sql = """SELECT owneditems.item FROM owneditems
         JOIN items ON owneditems.item = items.id
-        WHERE owneditems.player = "%s" AND """
+        WHERE owneditems.player = %i
+        AND items.name == "%s" ;""" % (player, itemname)
+    cursor.execute(sql)
+    result = bool(cursor.fetchone())
+    cursor.close()
+    return result
+
+def getSituationOf(player):
+    cursor = _dbcon.cursor()
+    sql = "SELECT situation FROM PLAYER WHERE id = %i;" % (player,)
+    cursor.execute(sql)
+    result = cursor.fetchone()[0]
+    cursor.close()
+    return result

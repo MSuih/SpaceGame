@@ -3,19 +3,21 @@ import gameParser as parser, connection
 def openInventory(player):
     inventoryOpen = True
     while inventoryOpen:
-        items = connection.getItemsFor(player)
+        items = connection.getItemsForPlayer(player, True)
         print("Items in inventory: ")
-        for item in items:
-            if item.visible: print(item.name)
+        if items:
+            for item in iterms:
+                print(item.name)
+        else:
+            print("Your inventory is empty")
         parse = parser.parseCommand(
             input("What do you want to do? (RETURN to close): "))
         if parse.command == parser.Commands.RETURN:
             inventoryOpen = False
         elif parse.command == parser.Commands.USE:
-            if not connection.playerHasItem()
-            # TODO: Check if item is usable
-            # and if player really has it in inventory
-            # if true, use it
-            # else print error
+            if not connection.playerHasItem(parse.target):
+                print("You do not have %s in your inventory" % (parse.target,))
+            else:
+                print("TODO: Handle item use")
         #FUTURE: inspect? other commands?
 

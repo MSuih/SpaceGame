@@ -7,7 +7,7 @@ import gameParser as parser, connection
 # returns tuple (firstname, lastname)
 def processInput(parse):
     if parse.command == parser.Commands.RETURN:
-        return True
+        return "Boolean is instance of int, so we have to use something else"
     elif parse.command == parser.Commands.LISTSAVES:
         playerList = connection.getPlayers()
         if playerList:
@@ -15,7 +15,7 @@ def processInput(parse):
             for p in playerList:
                 print(
                     "SAVE %i: %s %s, money: %i"
-                    % p.number, p.firstName, p.lastName, p.money)
+                    % (p.number, p.firstName, p.lastName, p.money))
         else: print("No saves found")
         return False
     elif parse.command == parser.Commands.LOADGAME:
@@ -26,6 +26,11 @@ def processInput(parse):
             return False
     elif parse.command == parser.Commands.NEWGAME:
         return _askNameFromPlayer()
+    elif parse.command == parser.Commands.DELETE:
+        if parse.target and parse.target.isdigit():
+            connection.deleteSave(int(parse.target))
+            print("Save number %s has been deleted" % (parse.target,))
+        return False
     else:
         return None
 

@@ -1,16 +1,16 @@
-import gameParser as parser, enum, main, game, menu, sys, connection
+import gameParser as parser, enum, main, game, menu, sys, connection, inventory
 
 class State(enum.Enum):
     MAINMENU, MENU, GAME, INVENTORY, QUIT = range(5)
 
-def main(): 
-    state = State.MAINMENU
-    player = None
+state = State.MAINMENU
+player = None
+
+def main():
+    global state, player
 
     print("Welcome to Beyond Infinity")
-    print("\nSTART - start a new player")
-    print("LIST - list saved players")
-    print("LOAD number - load a saved player")
+    _printMenu()
 
     while state != State.QUIT:
         parse = parser.parseCommand(input("=> "))
@@ -27,6 +27,8 @@ def main():
     return
 
 def _handleMenu(parse):
+    global state, player
+    
     value = menu.processInput(parse)
     if value:
         if isinstance(value, int):
@@ -46,7 +48,7 @@ def _handleMenu(parse):
             else:
                 print("Could not create a new player")
         else:
-            if state == MAINMENU:
+            if state == State.MAINMENU:
                 print("Cannot return - you have not loaded a save")
             else:
                 state = State.GAME
@@ -54,6 +56,7 @@ def _handleMenu(parse):
         print("Invalid command")
 
 def _handleGame(parse):
+    global state, player
     if player.isInCombat():
         number = player.getActiveCombat()
         if number == None:
@@ -69,12 +72,22 @@ def _handleGame(parse):
     else:
         if game.isSituationRelatedCommand(parse.command):
             # check if command is possible and execute it
+            print("No-op")
         else:
             if parse.command == parser.Commands.INVENTORY:
-                game.openInventory(player.number)
+                inventory.openInventory(player.number)
             elif parse.command == parser.Commands.MENU:
+                print("Main menu")
+                _printMenu()
+                print("RETURN - close menu and return to game")
                 state = State.MENU
                 
+
+def _printMenu():
+    print("\nSTART - start a new player")
+    print("LIST - list saved players")
+    print("LOAD number - load a saved player")
+    print("DELETE number - delete a save")
 
 def _startCombat(player, enemyNumber):
     if enemyNumber == None:

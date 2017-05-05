@@ -1,27 +1,24 @@
 import connection
 
 class Player():
-    def __init__(self, number, firstName, lastName, money = None):
+    def __init__(self, number, firstName, lastName):
         self.number = number
         self.firstName = firstName
         self.lastName = lastName
-        self.money = money
 
     def printCurrentSituation(self):
         print(connection.getSituationDescriptionForPlayer(self.number))
 
     def getSituationNumber(self):
-        if not self.situation:
-            self.situation = connection.getSituationForPlayer(number)
-        return self.situation
+        return connection.getSituationOf(self.number)
 
     def isInCombat(self):
         situation = self.getSituationNumber()
-        sit_enemy = connection.getEnemyNumberForSituation()
+        sit_enemy = connection.getEnemyForSituation(situation)
         return sit_enemy == False
     
     def enemyAlive():
-        connection.getEnemyForPlayer(self.number)
+        return connection.getEnemyForPlayer(self.number)
 
 # Starts and returns a new game 
 # name is a tuple of first and last names
@@ -32,10 +29,9 @@ def startNewGame(name):
     result = connection.createPlayerAndReturnId(first, last)
     if result:
         player = Player(
-            result.number,
-            result.firstName,
-            result.lastName,
-            result.money)
+            result,
+            first,
+            last)
         return player
     return None
 
@@ -44,7 +40,8 @@ def startNewGame(name):
 # returns None if a save was not found or could not be loaded
 def loadSave(number):
     status = connection.getPlayer(number)
-    if status: return Player(number)
+    if status: return Player(
+        status.number, status.firstName, status.lastName)
 
 # Checks if the command is situation-related 
 def isSituationRelatedCommand(command):
