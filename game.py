@@ -35,6 +35,7 @@ class Player():
             self.removeItem(fullmove.requirement, fullmove.requiredAmount)
         if fullmove.rewards:
             self.addItem(fullmove.rewards, fullmove.rewardedAmount)
+        connection.updateSituationForPlayer(fullmove.toSituation, self.number)
         return fullmove.description
             
 
@@ -66,11 +67,10 @@ def loadSave(number):
 # returns False if player is missing an item
 # returns RequirementsForNext if command can be performed 
 def canPerformCommand(player, parse):
-    attempts = connection.getNextSituation(player.getSituationNumber, parse)
+    attempts = connection.getNextSituation(player.getSituationNumber(), parse)
     if not attempts:
         return None
     for attempt in attempts:
-        if not attempt.requirement
-            or player.hasItem(attempt.requirement, attempt.requiredAmount):
+        if not attempt.requirement or player.hasItem(attempt.requirement, attempt.requiredAmount):
             return attempt
     return False

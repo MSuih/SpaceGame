@@ -73,7 +73,9 @@ def _handleGame(parse):
         if parser.isSituationalCommand(parse.command):
             result = game.canPerformCommand(player, parse)
             if result:
-                print(player.performCommand(result))
+                description = player.performCommand(result)
+                if description:
+                    print(description)
                 print("---")
                 player.printCurrentSituation()
             elif result is None:
@@ -88,6 +90,8 @@ def _handleGame(parse):
                 _printMenu()
                 print("RETURN - close menu and return to game")
                 state = State.MENU
+            else:
+                print("Invalid command")
                 
 
 def _printMenu():

@@ -1,4 +1,4 @@
-import mysql.connector as mysqlcon, collections
+import mysql.connector as mysqlcon, collections, gameParser as parser
 
 _dbcon = mysqlcon.connect(
     host="localhost",
@@ -208,14 +208,19 @@ def getSituationOf(player):
     cursor.close()
     return result
 
+def updateSituationForPlayer(newSituation, player):
+    cursor = _dbcon.cursor()
+    sql = "UPDATE Player SET situation = %i WHERE id = %i" % (newSituation, player)
+    cursor.execute(sql)
+    cursor.close()
+
 def getNextSituation(situation, parse):
     lista = []
     cursor = _dbcon.cursor()
     cnum = _getDBNumberForCommand(parse.command)
     sql = """SELECT toSituation, requires, requiredAmount FROM NextSituation
-        WHERE fromSituation = %i AND command = %i AND target = %
-        ORDER BY
-          CASE WHEN requires IS null THEN 1 ELSE 0,
+        WHERE fromSituation = %i AND command = %i AND target = "%s"
+        ORDER BY requires IS NULL,
           requiredAmount;""" % (situation, cnum, parse.target)
     cursor.execute(sql)
     for row in cursor.fetchall():
@@ -229,14 +234,16 @@ def getNextSituation(situation, parse):
 
 def getFullMove(currentSituation, reqForNext):
     cursor = _dbcon.cursor()
+    reqOrNone = "= " + str(reqForNext.requirement) if reqForNext.requirement else "IS NULL"
     sql = """SELECT toSituation, description,
     requires, requiredAmount, removeItem, rewards, rewardedAmount
     FROM NextSituation
     WHERE fromSituation = %i AND toSituation = %i
-    AND requires = %i AND requiredAmount = %i;""" %(currentSituation,
-            reqForNext.nextSituation, reqForNext.requirement, regForNext.requiredAmount)
-    cursor.executeQuery();
-    result = cursor.fetchone():
+    AND requires %s AND requiredAmount = %i;""" %(currentSituation,
+            reqForNext.nextSituation, reqOrNone, reqForNext.requiredAmount)
+    print(currentSituation, reqForNext.nextSituation, reqOrNone, reqForNext.requiredAmount);
+    cursor.execute(sql)
+    result = cursor.fetchone()
     fullmove = MovementToNext(
         toSituation = result[0],
         description = result[1],
@@ -256,16 +263,16 @@ def _getDBNumberForCommand(command):
         for dbcom in dblist:
             for parcom in parlist:
                 if parcom.name.lower() == dbcom.name.lower():
-                    _commancache[parcom] = dbcom.value
+                    _commandcache[parcom] = dbcom.value
                     break
             
     return _commandcache[command]
 
 DBCommands = collections.namedtuple("DBCommands", "name, value")
-def getCommands():
+def _getCommands():
     lista = []
     cursor = _dbcon.cursor()
-    sql = "SELECT id, name FROM Command"
+    sql = "SELECT id, command FROM Command"
     cursor.execute(sql)
     for row in cursor.fetchall():
         lista.append(DBCommands(name = row[1], value = row[0]))
