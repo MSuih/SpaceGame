@@ -73,6 +73,9 @@ def _isPartOfCommand(command, string):
         return string == "save"
     return False
 
+def isSituationalCommand(command):
+    lista = [Commands.GOTO, Commands.TALK]
+    return command in lista
 
 # Testing if the class works as intended
 def test():

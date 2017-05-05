@@ -10,6 +10,8 @@ _dbcon = mysqlcon.connect(
 SimplePlayer = collections.namedtuple(
     "SimplePlayer", "number, firstName, lastName, money")
 SimpleItem = collections.namedtuple("SimpleItem", "number, name, visible")
+RequirementsForNext = collections.namedtuple("RequirementsForNext",
+    "nextSituation, requirement, requiredAmount")
 
 
 def saveChanges():
@@ -91,6 +93,7 @@ def createPlayerAndReturnId(firstName, lastName):
         health = cursor.fetchone()[0]
     except TypeError:
         print("ERROR: ShipType 0 does not exist!")
+        cursor.close()
         return None
     # create a new ship for the player 
     newship = "INSERT INTO ship (health, shipType) VALUES (%d, 1);" % (health,)
@@ -168,8 +171,50 @@ def playerHasItem(player, itemname):
 
 def getSituationOf(player):
     cursor = _dbcon.cursor()
-    sql = "SELECT situation FROM PLAYER WHERE id = %i;" % (player,)
+    sql = "SELECT situation FROM Player WHERE id = %i;" % (player,)
     cursor.execute(sql)
     result = cursor.fetchone()[0]
     cursor.close()
     return result
+
+def getNextSituation(situation, parse):
+    lista = []
+    cursor = _dbcon.cursor()
+    #"next, requirement, requiredAmount
+    cnum = _getDBNumberForCommand()
+    sql = """SELECT toSituation, requires, requiredAmount FROM NextSituation
+        WHERE fromSituation = %i AND command = %i AND target = %;
+        """ % (situation, cnum, parse.target)
+    cursor.execute(sql)
+    for row in cursor.fetchall():
+        lista.append(
+            RequirementsForNext(
+                nextSituation = row[0],
+                requirement = row[1],
+                requiredAmount = row[2]))
+    cursor.close()
+    return lista
+
+_commandcache = {}
+def _getDBNumberForCommand(command):
+    if not _commandcache:
+        dblist = _getCommands()
+        parlist = parser.Commands
+        for dbcom in dblist:
+            for parcom in parlist:
+                if parcom.name.lower() == dbcom.name.lower():
+                    _commancache[parcom] = dbcom.value
+                    break
+            
+    return _commandcache[command]
+
+DBCommands = collections.namedtuple("DBCommands", "name, value")
+def getCommands():
+    lista = []
+    cursor = _dbcon.cursor()
+    sql = "SELECT id, name FROM Command"
+    cursor.execute(sql)
+    for row in cursor.fetchall():
+        lista.append(DBCommands(name = row[1], value = row[0]))
+    cursor.close()
+    return lista

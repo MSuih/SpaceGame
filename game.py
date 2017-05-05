@@ -43,7 +43,7 @@ def loadSave(number):
     if status: return Player(
         status.number, status.firstName, status.lastName)
 
-# Checks if the command is situation-related 
-def isSituationRelatedCommand(command):
-    print("TODO: situtional command check")
-    return False
+def canPerformCommand(player, parse):
+    attempt = connection.getNextSituation(player.getSituationNumber, parse)
+    if not attempt:
+        return False

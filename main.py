@@ -70,9 +70,8 @@ def _handleGame(parse):
             # Combat has ended
             return
     else:
-        if game.isSituationRelatedCommand(parse.command):
-            # check if command is possible and execute it
-            print("No-op")
+        if parser.isSituationalCommand(parse.command):
+            result = game.canPerformCommand(player, parse)
         else:
             if parse.command == parser.Commands.INVENTORY:
                 inventory.openInventory(player.number)
