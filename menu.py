@@ -34,8 +34,11 @@ def processInput(parse):
     else:
         return None
 
+#Plays the introduction up untill player is asked a name, after that the game starts
 def _askNameFromPlayer():
-	print("-- Replace with interduction --")
+	print("You have finally made it. After months of training, you've finally been licensed to operate on a spaceship and assigned to one. Space travel has always been your dream and finally that dream is being fulfilled\n")
+	print("After being directed to the sleeping quaters you started on placing your stuff in the locker. As you put your last item - a spare pair of boots - into the locker, you hear footsteps behind you. By looking at his uniform you can clearly tell that he is running the show here.\n")
+	print("\"You must be the replacement they sent here, right? What is your name?\"")
 	first = input("First name: ")
 	last = input("Last name: ")
 	return (first, last)

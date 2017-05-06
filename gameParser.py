@@ -73,6 +73,7 @@ def _isPartOfCommand(command, string):
         return string == "save"
     return False
 
+# Is this command a situation-related one (talk, move and so on)
 def isSituationalCommand(command):
     lista = [Commands.GOTO, Commands.TALK]
     return command in lista

@@ -12,13 +12,15 @@ class Player():
     def getSituationNumber(self):
         return connection.getSituationOf(self.number)
 
+    # returns true if the situation player is in involves combat
+    # the enemy might be dead though
     def isInCombat(self):
         situation = self.getSituationNumber()
         sit_enemy = connection.getEnemyForSituation(situation)
         return sit_enemy == False
     
     def enemyAlive():
-        return connection.getEnemyForPlayer(self.number)
+        return connection.getEnemyForPlayer(self.number, True)
 
     def hasItem(self, item, amount = 1):
         return connection.hasPlayerAmountOfItem(self.number, item, amount)
@@ -29,6 +31,9 @@ class Player():
     def addItem(self, item, amount = 1):
         connection.addItemToPlayer(item, self.number, amount)
 
+    # Performs a command that changes the situation of the player
+    # removes or adds items if that is required for this move
+    # Please check if the command is possible or player has items before running this
     def performCommand(self, reqForNext):
         fullmove = connection.getFullMove(self.getSituationNumber(),reqForNext)
         if fullmove.removeItem:

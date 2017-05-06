@@ -30,6 +30,7 @@ def deleteSave(number):
     cursor.execute(sql)
     cursor.close()
 
+# Get every player in database
 def getPlayers():
     playerList = []
     cursor = _dbcon.cursor()
@@ -46,6 +47,7 @@ def getPlayers():
     cursor.close()
     return playerList
 
+# Get information about player
 def getPlayer(number):
     cursor = _dbcon.cursor()
     sql = "SELECT id, firstName, lastName, money FROM player WHERE id = " + str(number) + ";"
@@ -61,6 +63,7 @@ def getPlayer(number):
     cursor.close()
     return player
 
+# Get a description of the situation a player is in
 def getSituationDescriptionForPlayer(number):
     cursor = _dbcon.cursor()
     sql = """SELECT description FROM situation
@@ -71,14 +74,22 @@ def getSituationDescriptionForPlayer(number):
     cursor.close()
     return description
 
-def getEnemyForPlayer(number):
+# Get the enemy type for the current situation (can be None)
+def getEnemyForPlayer(number, isAlive):
     cursor = _dbcon.cursor()
-    sql = "SELECT lastEncounter FROM player WHERE id = " + str(number)
+    sql = None
+    if isAlive:
+        """SELECT lastEncounter FROM Player
+            JOIN Ship on Player.lastEncounter = Ship.id
+            WHERE id = %i AND health > 0""" % (number,)
+    else:
+        sql = "SELECT lastEncounter FROM player WHERE id = " + str(number) +";"
     cursor.execute(sql)
     result = cursor.fetchone()[0]
     cursor.close()
     return result
 
+# Is this enemy same enemy type as in this situation
 def isCorrectEnemyForSituation(enemy, situation):
     cursor = _dbcon.cursor()
     sql = """SELECT enemy.id FROM enemy
@@ -116,11 +127,27 @@ def createPlayerAndReturnId(firstName, lastName):
     # return id
     return number
 
+# Adds all systems and weapons to ship that are defined for systemtype
 def addSystemsAndWeaponsToShip(shiptype, ship):
-    # TODO!
-    #find each systemtype for this type
-    #create systems from types
-    #do the same for weapon types
+    cursor = _dbcon.cursor()
+    getSystems = """SELECT system, maxHealth FROM SystemsForType
+        JOIN Systemtype ON SystemsForType.system = Systemtype.id
+        WHERE shipType = %i;""" % (shiptype,)
+    cursor.execute(getSystems)
+    results = cursor.fetchall()
+    for row in results:
+        sql = """INSERT INTO System (health, ship, systemtype)
+            VALUES (%i, %i, %i)""" % (row[1], ship, row[0])
+        cursor.execute(sql)
+    getWeapons = """SELECT weapon FROM WeaponsForType
+        WHERE shipType = %i;""" % (shiptype,)
+    cursor.execute(getWeapons)
+    results = cursor.fetchall()
+    for row in results:
+        sql = """INSERT INTO WeaponsForShip (ship, weapon)
+             VALUES (%i, %i)""" % (ship, row[0])
+        cursor.execute(sql)
+    cursor.close()
     return
 
 def getEnemyForSituation(situation):
@@ -131,6 +158,7 @@ def getEnemyForSituation(situation):
     cursor.close()
     return number
 
+# Creates a new instance of enemytype
 def createAndReturnEnemy(enemyType):
     cursor = _dbcon.cursor()
     sqlHealth = "SELECT maxHealth FROM ShipType WHERE id = " +str(enemytype)+";"
@@ -162,6 +190,7 @@ def getItemsForPlayer(player, visibleOnly):
     cursor.close()
     return items
 
+# Check if player has a item with a certain name
 def playerHasItem(player, itemname):
     cursor = _dbcon.cursor()
     sql = """SELECT owneditems.item FROM owneditems
@@ -189,6 +218,7 @@ def addItemToPlayer(player, item, amount):
         cursor.execute(sql)
     cursor.close()
 
+# Check if player has certain amount of a item or more
 def hasPlayerAmountOfItem(player, item, amount):
     cursor = _dbcon.cursor()
     sql = """SELECT count(item) FROM OwnedItems
@@ -214,6 +244,8 @@ def updateSituationForPlayer(newSituation, player):
     cursor.execute(sql)
     cursor.close()
 
+# Player has given a command for moving from one situation to another
+# Get a list of where player could end up and what items are required for that
 def getNextSituation(situation, parse):
     lista = []
     cursor = _dbcon.cursor()
@@ -232,6 +264,8 @@ def getNextSituation(situation, parse):
     cursor.close()
     return lista
 
+# Get more information about a move to next situation
+# reqForNext is an object returned by getNextSituation()
 def getFullMove(currentSituation, reqForNext):
     cursor = _dbcon.cursor()
     reqOrNone = "= " + str(reqForNext.requirement) if reqForNext.requirement else "IS NULL"
@@ -241,7 +275,6 @@ def getFullMove(currentSituation, reqForNext):
     WHERE fromSituation = %i AND toSituation = %i
     AND requires %s AND requiredAmount = %i;""" %(currentSituation,
             reqForNext.nextSituation, reqOrNone, reqForNext.requiredAmount)
-    print(currentSituation, reqForNext.nextSituation, reqOrNone, reqForNext.requiredAmount);
     cursor.execute(sql)
     result = cursor.fetchone()
     fullmove = MovementToNext(
@@ -255,6 +288,8 @@ def getFullMove(currentSituation, reqForNext):
     cursor.close()
     return fullmove
 
+# Get the ID number for this command
+# Caches the id numbers into a cache so that db is not queried every single time
 _commandcache = {}
 def _getDBNumberForCommand(command):
     if not _commandcache:
@@ -268,6 +303,7 @@ def _getDBNumberForCommand(command):
             
     return _commandcache[command]
 
+# Gets a list of all commands that are stored in the database
 DBCommands = collections.namedtuple("DBCommands", "name, value")
 def _getCommands():
     lista = []

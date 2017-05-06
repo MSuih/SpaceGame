@@ -1,7 +1,7 @@
 import gameParser as parser, enum, main, game, menu, sys, connection, inventory
 
 class State(enum.Enum):
-    MAINMENU, MENU, GAME, INVENTORY, QUIT = range(5)
+    MAINMENU, MENU, GAME, QUIT = range(4)
 
 state = State.MAINMENU
 player = None
@@ -76,7 +76,7 @@ def _handleGame(parse):
                 description = player.performCommand(result)
                 if description:
                     print(description)
-                print("---")
+                    print("---")
                 player.printCurrentSituation()
             elif result is None:
                 print("Invalid command or target")
@@ -102,7 +102,6 @@ def _printMenu():
 
 def _startCombat(player, enemyNumber):
     if enemyNumber == None:
-        #TODO: create a new enemy
         enemytype = connection.getEnemyForSituation()
         enemy = connection.createAndReturnEnemy(enemytype)
         player.setEnemy(enemy)

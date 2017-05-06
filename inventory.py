@@ -1,5 +1,7 @@
 import gameParser as parser, connection
 
+# Opens the inventory and lets player interact with it
+# Returns once player requirests it, allowing player to do multiple things to his invenory
 def openInventory(player):
     inventoryOpen = True
     while inventoryOpen:
