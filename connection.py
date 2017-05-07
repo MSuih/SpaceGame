@@ -130,8 +130,8 @@ def createPlayerAndReturnId(firstName, lastName):
 # Adds all systems and weapons to ship that are defined for systemtype
 def addSystemsAndWeaponsToShip(shiptype, ship):
     cursor = _dbcon.cursor()
-    getSystems = """SELECT system, maxHealth FROM SystemsForType
-        JOIN Systemtype ON SystemsForType.system = Systemtype.id
+    getSystems = """SELECT systemType, maxHealth FROM SystemsForType
+        JOIN Systemtype ON SystemsForType.systemType = SystemType.id
         WHERE shipType = %i;""" % (shiptype,)
     cursor.execute(getSystems)
     results = cursor.fetchall()
@@ -210,7 +210,7 @@ def removeItemFromPlayer(player, item, amount):
     cursor.execute(sql)
     cursor.close()
     
-def addItemToPlayer(player, item, amount):
+def addItemToPlayer(item, player, amount):
     cursor = _dbcon.cursor()
     sql = """INSERT INTO OwnedItems (player, item)
         VALUES (%i, %i);""" % (player, item)
@@ -226,9 +226,9 @@ def hasPlayerAmountOfItem(player, item, amount):
     cursor.execute(sql)
     result = cursor.fetchone()
     if result:
-        result = result >= amount
+        result = result[0] >= amount
     cursor.close()
-    return result()
+    return result
 
 def getSituationOf(player):
     cursor = _dbcon.cursor()

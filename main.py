@@ -76,7 +76,7 @@ def _handleGame(parse):
                 description = player.performCommand(result)
                 if description:
                     print(description)
-                    print("---")
+                    input("Press ENTER to continue")
                 player.printCurrentSituation()
             elif result is None:
                 print("Invalid command or target")

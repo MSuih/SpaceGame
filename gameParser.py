@@ -4,7 +4,7 @@ import collections, enum
 class Commands(enum.Enum):
     INVALID, QUIT, GOTO, TALK, INVENTORY = range(0, 5)
     LISTSAVES, LOADGAME, NEWGAME, RETURN, DELETE = range(5, 10)
-    USE, MENU = range(10, 12)
+    USE, MENU, LEAVE = range(10, 13)
 
 # Tuple that contains a command and the target of that command
 # ParseResult.command is one of the commands defined above (enum)
@@ -42,6 +42,8 @@ def parseCommand(command):
         command = Commands.DELETE
     elif firstPart == "menu":
         command = Commands.MENU
+    elif firstPart == "leave" or firstpart == "end":
+        command = Commands.LEAVE
     else:
         #Command not found
         return ParseResult(command = Commands.INVALID, target = None)
@@ -75,7 +77,7 @@ def _isPartOfCommand(command, string):
 
 # Is this command a situation-related one (talk, move and so on)
 def isSituationalCommand(command):
-    lista = [Commands.GOTO, Commands.TALK]
+    lista = [Commands.GOTO, Commands.TALK, Commands.LEAVE]
     return command in lista
 
 # Testing if the class works as intended
