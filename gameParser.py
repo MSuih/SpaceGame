@@ -42,7 +42,7 @@ def parseCommand(command):
         command = Commands.DELETE
     elif firstPart == "menu":
         command = Commands.MENU
-    elif firstPart == "leave" or firstpart == "end":
+    elif firstPart == "leave" or firstPart == "end":
         command = Commands.LEAVE
     else:
         #Command not found
