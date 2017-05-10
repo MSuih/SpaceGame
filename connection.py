@@ -202,7 +202,7 @@ def playerHasItem(player, itemname):
     cursor.close()
     return result
 
-def removeItemFromPlayer(player, item, amount):
+def removeItemFromPlayer(item, player, amount):
     cursor = _dbcon.cursor()
     sql = """DELETE FROM OwnedItems
         WHERE player = %i AND item = %i
